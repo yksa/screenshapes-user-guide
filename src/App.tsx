@@ -1,6 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
 import html2canvas from 'html2canvas-pro';
 
+const DEFAULT_TITLE_COLOR = '#18181b';
+
 // --- Icons (Inline SVGs for self-containment) ---
 const Icons = {
   Upload: ({ className = "w-6 h-6" }) => (
@@ -29,6 +31,9 @@ const Icons = {
   ),
   Sliders: ({ className = "w-4 h-4" }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="2" x2="6" y1="14" y2="14"/><line x1="10" x2="14" y1="8" y2="8"/><line x1="18" x2="22" y1="16" y2="16"/></svg>
+  ),
+  Palette: ({ className = "w-4 h-4" }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.123-.29-.289-.438-.652-.438-1.123a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
   )
 };
 
@@ -118,6 +123,7 @@ export default function App() {
               type: isMobile ? 'phone' : 'laptop',
               title: '', // Keep empty initially, so it auto-computes sequences
               isCustomTitle: false,
+              titleColor: DEFAULT_TITLE_COLOR,
               objectFit: 'cover' // default
             });
           };
@@ -238,7 +244,8 @@ export default function App() {
           clonedDoc.querySelectorAll<HTMLInputElement>('.export-title-input').forEach((input) => {
             const span = clonedDoc.createElement('span');
             span.textContent = input.value;
-            span.className = 'text-2xl font-semibold text-center px-2 py-1 text-zinc-900';
+            span.className = 'text-2xl font-semibold text-center px-2 py-1';
+            span.style.color = input.style.color || DEFAULT_TITLE_COLOR;
             input.replaceWith(span);
           });
 
@@ -406,6 +413,7 @@ export default function App() {
                                 isCustomTitle: val.trim() !== "" // Mark custom if non-empty custom string
                               });
                             }}
+                            style={{ color: step.titleColor ?? DEFAULT_TITLE_COLOR }}
                             className="export-title-input text-2xl font-semibold bg-transparent border-b-2 border-transparent hover:border-zinc-200 focus:border-zinc-900 focus:outline-none text-center transition-colors min-w-[100px] max-w-[300px] placeholder-zinc-300 px-2 py-1"
                             placeholder="Enter title..."
                           />
@@ -446,6 +454,27 @@ export default function App() {
                              >
                               {step.objectFit === 'cover' ? 'Fit' : 'Fill'}
                              </button>
+
+                             <div className="w-px h-4 bg-zinc-200 mx-1"></div>
+
+                             <label
+                              className="relative p-2 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 transition-colors cursor-pointer"
+                              title="Title color"
+                             >
+                              <input
+                                type="color"
+                                value={step.titleColor ?? DEFAULT_TITLE_COLOR}
+                                onChange={(e) => updateStep(step.id, { titleColor: e.target.value })}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              />
+                              <span className="flex items-center gap-1">
+                                <Icons.Palette />
+                                <span
+                                  className="w-3 h-3 rounded-full border border-zinc-300"
+                                  style={{ backgroundColor: step.titleColor ?? DEFAULT_TITLE_COLOR }}
+                                />
+                              </span>
+                             </label>
 
                              <div className="w-px h-4 bg-zinc-200 mx-1"></div>
 
